@@ -7,14 +7,12 @@ import (
 	"strings"
 
 	"github.com/shipurjan/subtitle-to-lrc/converter/shared"
-	"github.com/shipurjan/subtitle-to-lrc/converter/srt"
 	"github.com/shipurjan/subtitle-to-lrc/converter/vtt"
 )
 
 func ConvertToLyricsFile(subtitle_file []string, extension string, args shared.UserArgs) ([]string, error) {
 	converters := map[string]func([]string) ([]shared.SubtitleChunk, error){
 		"vtt": vtt.ConvertToChunks,
-		"srt": srt.ConvertToChunks,
 	}
 
 	if Converter, ok := converters[extension]; ok {
