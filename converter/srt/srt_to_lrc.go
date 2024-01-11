@@ -1,5 +1,13 @@
 package srt
 
-func ConvertToLrc(srt_file []byte) ([]byte, error) {
-	return []byte{}, nil
+import (
+	"log"
+
+	"github.com/shipurjan/subtitle-to-lrc/converter/shared"
+)
+
+func ConvertToChunks(srt_file []string) ([]shared.SubtitleChunk, error) {
+	log.Println(srt_file[0])
+
+	return nil, nil
 }
