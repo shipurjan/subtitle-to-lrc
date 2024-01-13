@@ -1,7 +1,8 @@
 package shared
 
 type UserArgs struct {
-	Separator string
+	Separator     string
+	NoLengthLimit bool
 }
 
 type SubtitleChunk struct {

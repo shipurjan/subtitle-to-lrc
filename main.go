@@ -17,19 +17,31 @@ import (
 func main() {
 
 	app := &cli.App{
-		Name:                 "subtitle-to-lrc",
-		Version:              "0.1.0",
-		Usage:                "Convert subtitle files to .lrc format",
-		UsageText:            "subtitle-to-lrc [options] <input-file> [output-file]\nIf [output-file] is not provided the program will use input-file with its extension replaced with .lrc",
-		Compiled:             time.Now(),
-		EnableBashCompletion: true,
-		HideHelpCommand:      true,
-		Authors:              []*cli.Author{{Name: "Cyprian Zdebski", Email: "cyprianz5mail@gmail.com"}},
+		Name:    "subtitle-to-lrc",
+		Version: "0.1.0",
+		Usage:   "Convert subtitle files to .lrc format",
+		UsageText: "subtitle-to-lrc [options] <input-file> [output-file]\n" +
+			"<input-file> - the file must have an allowed subtitle extension (e.g. .srt, .vtt)\n" +
+			"[output-file] - if not provided the program will use <input-file> filename with its extension replaced by .lrc",
+		Compiled:               time.Now(),
+		EnableBashCompletion:   true,
+		HideHelpCommand:        true,
+		Authors:                []*cli.Author{{Name: "Cyprian Zdebski", Email: "cyprianz5mail@gmail.com"}},
+		UseShortOptionHandling: true,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:  "separator",
-				Value: "  ",
-				Usage: "Separator to use to join lines when input subtitle file has multiple lines; a .lrc file can only have one subtitle line for each timestamp",
+				Name:    "separator",
+				Value:   "  ",
+				Aliases: []string{"s"},
+				Usage: "Separator to use to join lines when input subtitle file has multiple lines;\n" +
+					".lrc files can only have one subtitle line for each timestamp",
+			},
+			&cli.BoolFlag{
+				Name:    "no-length-limit",
+				Aliases: []string{"n"},
+				Usage: "Disables the length limit of a .lrc file;\n" +
+					"by default a .lrc file can only have a maximum length of 59:59.99\n" +
+					"(some players may not support longer durations)",
 			},
 		},
 		Action: func(cCtx *cli.Context) error {
@@ -38,8 +50,11 @@ func main() {
 			}
 
 			args := shared.UserArgs{
-				Separator: cCtx.String("separator"),
+				Separator:     cCtx.String("separator"),
+				NoLengthLimit: cCtx.Bool("no-length-limit"),
 			}
+
+			println(args.NoLengthLimit)
 
 			// Read the argument
 			var input_path string

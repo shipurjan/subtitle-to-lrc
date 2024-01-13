@@ -3,16 +3,19 @@ package converter
 import (
 	"errors"
 	"fmt"
+	"log"
 	"sort"
 	"strings"
 
 	"github.com/shipurjan/subtitle-to-lrc/converter/shared"
+	"github.com/shipurjan/subtitle-to-lrc/converter/srt"
 	"github.com/shipurjan/subtitle-to-lrc/converter/vtt"
 )
 
 func ConvertToLyricsFile(subtitle_file []string, extension string, args shared.UserArgs) ([]string, error) {
 	converters := map[string]func([]string) ([]shared.SubtitleChunk, error){
 		"vtt": vtt.ConvertToChunks,
+		"srt": srt.ConvertToChunks,
 	}
 
 	if Converter, ok := converters[extension]; ok {
@@ -20,7 +23,7 @@ func ConvertToLyricsFile(subtitle_file []string, extension string, args shared.U
 		if err != nil {
 			return nil, err
 		}
-		validated_chunks, err := ValidateAndPrettifyChunks(chunks)
+		validated_chunks, err := ValidateAndPrettifyChunks(chunks, args)
 		if err != nil {
 			return nil, err
 		}
@@ -29,7 +32,7 @@ func ConvertToLyricsFile(subtitle_file []string, extension string, args shared.U
 	return nil, errors.New("unsupported subtitle file extension: " + extension)
 }
 
-func ValidateAndPrettifyChunks(chunks []shared.SubtitleChunk) ([]shared.SubtitleChunk, error) {
+func ValidateAndPrettifyChunks(chunks []shared.SubtitleChunk, args shared.UserArgs) ([]shared.SubtitleChunk, error) {
 	// Sort in chronological order
 	sort.Slice(chunks, func(i, j int) bool {
 		return chunks[i].StartTimeMs < chunks[j].StartTimeMs
@@ -45,9 +48,14 @@ func ValidateAndPrettifyChunks(chunks []shared.SubtitleChunk) ([]shared.Subtitle
 		}
 	}
 
-	last_chunk := chunks[len(chunks)-1]
-	if last_chunk.EndTimeMs > 3599999 {
-		return nil, errors.New("subtitle file is too long; maximum supported length of a .lrc file is 59:59.99")
+	if !args.NoLengthLimit {
+		log.Println("Checking if the subtitle file is too long")
+		last_chunk := chunks[len(chunks)-1]
+		if last_chunk.EndTimeMs > 3599999 {
+			return nil, errors.New("subtitle file is too long (details below):\n" +
+				"\tmaximum supported length of a .lrc file is 59:59.99;\n" +
+				"\tyou can disable this limit with --no-length-limit flag (see --help)")
+		}
 	}
 
 	return chunks, nil
