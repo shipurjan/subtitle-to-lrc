@@ -14,11 +14,15 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var (
+	version string
+)
+
 func main() {
 
 	app := &cli.App{
 		Name:    "subtitle-to-lrc",
-		Version: "0.1.0",
+		Version: version,
 		Usage:   "Convert subtitle files to .lrc format",
 		UsageText: "subtitle-to-lrc [options] <input-file> [output-file]\n" +
 			"<input-file> - the file must have an allowed subtitle extension (e.g. .srt, .vtt)\n" +
