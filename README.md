@@ -1,5 +1,6 @@
 # subtitle-to-lrc
-[![Build and release](https://github.com/shipurjan/subtitle-to-lrc/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/shipurjan/subtitle-to-lrc/actions/workflows/go.yml)
+[![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
+[![Build and release](https://github.com/shipurjan/subtitle-to-lrc/actions/workflows/go.yml/badge.svg?branch=master)](https://github.com/shipurjan/subtitle-to-lrc/actions/workflows/go.yml) 
 
 A program that converts a subtitle file into an [`.lrc` file](https://en.wikipedia.org/wiki/LRC_(file_format))
 
@@ -8,6 +9,8 @@ Currently supported input formats: `.vtt`, `.srt`
 ## Why?
 
 One use case is to convert podcast subtitles to the lyrics format (.lrc), which can then be played on various portable music/media players
+
+
 
 ## Download
 
