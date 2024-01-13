@@ -3,7 +3,6 @@ package converter
 import (
 	"errors"
 	"fmt"
-	"log"
 	"sort"
 	"strings"
 
@@ -49,7 +48,6 @@ func ValidateAndPrettifyChunks(chunks []shared.SubtitleChunk, args shared.UserAr
 	}
 
 	if !args.NoLengthLimit {
-		log.Println("Checking if the subtitle file is too long")
 		last_chunk := chunks[len(chunks)-1]
 		if last_chunk.EndTimeMs > 3599999 {
 			return nil, errors.New("subtitle file is too long (details below):\n" +

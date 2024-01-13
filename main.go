@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -58,8 +58,6 @@ func main() {
 				NoLengthLimit: cCtx.Bool("no-length-limit"),
 			}
 
-			println(args.NoLengthLimit)
-
 			// Read the argument
 			var input_path string
 			if len(cCtx.Args().Get(0)) == 0 {
@@ -71,14 +69,13 @@ func main() {
 			// Convert to absolute path
 			input_abs_path, err := filepath.Abs(input_path)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
-			log.Println("Reading", input_abs_path)
 			// Verify if the provided subtitle file is valid for conversion
 			subtitle_file, subtitle_extension, err := utils.ReadSubtitleFile(input_abs_path)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
 			var output_path string
@@ -90,28 +87,26 @@ func main() {
 
 			output_abs_path, err := filepath.Abs(output_path)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
-			log.Println("Converting to a .lrc file format")
 			// Convert subtitle file to lrc
 			lyrics_file, err := converter.ConvertToLyricsFile(subtitle_file, subtitle_extension, args)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 
-			log.Println("Writing converted subtitle to", output_abs_path)
 			if err := writeLyricsFile(lyrics_file, output_abs_path); err != nil {
-				log.Fatal(err)
+				return err
 			}
-			log.Println("Successfully finished")
+			fmt.Println("[OK]", output_abs_path)
 
 			return nil
 		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		fmt.Println("[ERROR]", err)
 	}
 }
 

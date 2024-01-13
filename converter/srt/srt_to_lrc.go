@@ -2,7 +2,6 @@ package srt
 
 import (
 	"errors"
-	"log"
 	"strconv"
 	"strings"
 
@@ -10,12 +9,15 @@ import (
 )
 
 func ConvertToChunks(srt_file []string) ([]shared.SubtitleChunk, error) {
-	body_chunks := SplitBodyIntoChunks(srt_file)
+	body_chunks, err := SplitBodyIntoChunks(srt_file)
+	if err != nil {
+		return nil, err
+	}
 
 	return body_chunks, nil
 }
 
-func SplitBodyIntoChunks(body []string) []shared.SubtitleChunk {
+func SplitBodyIntoChunks(body []string) ([]shared.SubtitleChunk, error) {
 	chunks := make([]shared.SubtitleChunk, 0)
 	chunk_candidate := make([]string, 0)
 
@@ -23,7 +25,11 @@ func SplitBodyIntoChunks(body []string) []shared.SubtitleChunk {
 		if line == "" {
 			// Get rid of comments etc.
 			if IsChunkCandidateValid(chunk_candidate) {
-				chunks = append(chunks, PostProcessChunk(chunk_candidate))
+				chunk, err := PostProcessChunk(chunk_candidate)
+				if err != nil {
+					return nil, err
+				}
+				chunks = append(chunks, chunk)
 			}
 			chunk_candidate = make([]string, 0)
 		} else {
@@ -33,10 +39,14 @@ func SplitBodyIntoChunks(body []string) []shared.SubtitleChunk {
 
 	// Add the last chunk if EOF is detected
 	if len(chunk_candidate) > 0 && IsChunkCandidateValid(chunk_candidate) {
-		chunks = append(chunks, PostProcessChunk(chunk_candidate))
+		chunk, err := PostProcessChunk(chunk_candidate)
+		if err != nil {
+			return nil, err
+		}
+		chunks = append(chunks, chunk)
 	}
 
-	return chunks
+	return chunks, nil
 }
 
 func IsChunkCandidateValid(chunk_candidate []string) bool {
@@ -48,7 +58,7 @@ func IsChunkCandidateValid(chunk_candidate []string) bool {
 	return false
 }
 
-func PostProcessChunk(validated_chunk_candidate []string) shared.SubtitleChunk {
+func PostProcessChunk(validated_chunk_candidate []string) (shared.SubtitleChunk, error) {
 	var newChunk []string
 	for i, line := range validated_chunk_candidate {
 		if strings.Contains(line, "-->") {
@@ -58,10 +68,10 @@ func PostProcessChunk(validated_chunk_candidate []string) shared.SubtitleChunk {
 	}
 	start_time, end_time, err := GetChunkTimes(newChunk[0])
 	if err != nil {
-		log.Fatal(err)
+		return shared.SubtitleChunk{}, err
 	}
 
-	return shared.SubtitleChunk{StartTimeMs: start_time, EndTimeMs: end_time, Lines: newChunk[1:]}
+	return shared.SubtitleChunk{StartTimeMs: start_time, EndTimeMs: end_time, Lines: newChunk[1:]}, nil
 }
 
 func GetChunkTimes(timeLine string) (int, int, error) {
