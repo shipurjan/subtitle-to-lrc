@@ -36,16 +36,23 @@ jobs:
 
     - name: Create artifacts directory
       run: mkdir artifacts
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y musl-dev gcc
 
     - name: Build for different platforms
       run: |
-        PLATFORMS=("windows/amd64" "linux/amd64")
+        PLATFORMS=($(go tool dist list | grep -E '^windows|^linux/(amd64|arm|386)|^darwin'))
         for PLATFORM in "${PLATFORMS[@]}"
         do
           arr=(${PLATFORM//\// })
+          echo "${arr[0]}/${arr[1]}"
+
           GOOS=${arr[0]} GOARCH=${arr[1]} bash -c '\
             go build -o out/ -ldflags "-X main.version=${VERSION}" &&
-            zip -j artifacts/${{ github.event.repository.name }}_${VERSION}-$GOOS-$GOARCH.zip out/* &&
+            zip -j artifacts/${{ github.event.repository.name }}_$GOOS-$GOARCH.zip out/* &&
             rm -rf out/*'
         done
 
