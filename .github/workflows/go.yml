@@ -9,16 +9,53 @@ on:
     tags:
       - 'v*.*.*'
     
+
 jobs:
+
+  context:
+    name: Dump context
+    runs-on: ubuntu-latest
+    steps:
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
+        
+    - name: Dump job context
+      env:
+        JOB_CONTEXT: ${{ toJson(job) }}
+      run: echo "$JOB_CONTEXT"
+
+    - name: Dump steps context
+      env:
+        STEPS_CONTEXT: ${{ toJson(steps) }}
+      run: echo "$STEPS_CONTEXT"
+
+    - name: Dump runner context
+      env:
+        RUNNER_CONTEXT: ${{ toJson(runner) }}
+      run: echo "$RUNNER_CONTEXT"
+
+    - name: Dump strategy context
+      env:
+        STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+      run: echo "$STRATEGY_CONTEXT"
+
+    - name: Dump matrix context
+      env:
+        MATRIX_CONTEXT: ${{ toJson(matrix) }}
+      run: echo "$MATRIX_CONTEXT"
+        
+        
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Exit if not on master branch
-      if: endsWith(github.event.base_ref, 'master') == false
-      run: exit -1
+      if: github.event.base_ref && endsWith(github.event.base_ref, 'master') == false
+      run: exit 1
 
     - name: Write release version
       run: |
@@ -52,7 +89,8 @@ jobs:
 
           GOOS=${arr[0]} GOARCH=${arr[1]} bash -c '\
             go build -o out/ -ldflags "-X main.version=${VERSION}" &&
-            zip -j artifacts/${{ github.event.repository.name }}_$GOOS-$GOARCH.zip out/* &&
+            cp {LICENSE,README.md} out/ &&
+            zip -j artifacts/${{ github.event.repository.name }}_$GOOS-$GOARCH.zip out/*
             rm -rf out/*'
         done
 
@@ -67,6 +105,8 @@ jobs:
       with:
         name: build-artifact
         path: ./artifacts
+        if-no-files-found: error
+
 
   release:
     name: Github release

@@ -2,5 +2,8 @@
 *.srt
 *.lrc
 *.mp3
+.vscode/
 .githubvars
 main
+out/
+test

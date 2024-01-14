@@ -1,0 +1,17 @@
+#!/bin/sh
+
+TAG=$(git tag --points-at HEAD)
+[[ $TAG =~ ^v.*\..*\...*$ ]] || {
+    echo "No version tag found, skipping building..."
+    exit 0
+}
+
+echo "Building..."
+go build -o out/subtitle-to-lrc -ldflags "-X main.version=${TAG:1}"
+
+echo "Updating README.md..."
+python scripts/update_readme.py out/subtitle-to-lrc
+
+git add README.md
+git commit --amend --no-edit
+git push -f
