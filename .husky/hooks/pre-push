@@ -6,8 +6,12 @@ TAG=$(git tag --points-at HEAD)
     exit 0
 }
 
+echo "Computing supported extensions..."
+SUPPORTED_EXTENSIONS=$(python scripts/compute_supported_extensions.py)
+echo "Found supported extensions:" $SUPPORTED_EXTENSIONS
+
 echo "Building..."
-go build -o out/subtitle-to-lrc -ldflags "-X main.version=${TAG:1}"
+go build -o out/subtitle-to-lrc -ldflags "-X 'main.version=${TAG:1}' -X 'main.supported_extensions=${SUPPORTED_EXTENSIONS}'"
 
 echo "Updating README.md..."
 python scripts/update_readme.py out/subtitle-to-lrc
