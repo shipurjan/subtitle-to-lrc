@@ -62,6 +62,8 @@ jobs:
         VERSION=${GITHUB_REF_NAME#v}
         echo Version: $VERSION
         echo "VERSION=$VERSION" >> $GITHUB_ENV
+        
+    - run: sudo apt-get update -y && sudo apt-get install tree zip -y
 
     - name: Show directory tree before build
       run: tree
@@ -71,24 +73,30 @@ jobs:
       with:
         go-version: '1.21.5'
 
+    - name: Test
+      run: go test -v ./...
+
     - name: Create artifacts directory
       run: mkdir artifacts
     
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y musl-dev gcc
+    - uses: actions/setup-python@v5 
+      with:
+        python-version: '3.11'
 
     - name: Build for different platforms
       run: |
         PLATFORMS=($(go tool dist list | grep -E '^windows|^linux/(amd64|arm|386)|^darwin'))
+        SUPPORTED_EXTENSIONS=$(python scripts/compute_supported_extensions.py)
+        LDFLAGS="-X 'main.supported_extensions=$SUPPORTED_EXTENSIONS' -X 'main.version=$VERSION'"
+
         for PLATFORM in "${PLATFORMS[@]}"
         do
           arr=(${PLATFORM//\// })
           echo "${arr[0]}/${arr[1]}"
 
-          GOOS=${arr[0]} GOARCH=${arr[1]} bash -c '\
-            go build -o out/ -ldflags "-X main.version=${VERSION}" &&
+          GOOS=${arr[0]} GOARCH=${arr[1]} FLAGS=$LDFLAGS bash -c '
+            go build -o out/ -ldflags "$FLAGS" &&
+            echo "$LDFLAGS" &&
             cp {LICENSE,README.md} out/ &&
             zip -j artifacts/${{ github.event.repository.name }}_$GOOS-$GOARCH.zip out/*
             rm -rf out/*'
@@ -96,9 +104,6 @@ jobs:
 
     - name: Show directory tree after build
       run: tree
-
-    - name: Test
-      run: go test -v ./...
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4.1.0

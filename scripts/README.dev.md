@@ -1,0 +1,1 @@
+Always call python scripts from the base repository directory

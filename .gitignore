@@ -2,6 +2,7 @@
 *.srt
 *.lrc
 *.mp3
+*.exe
 .vscode/
 .githubvars
 main

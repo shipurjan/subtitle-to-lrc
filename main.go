@@ -15,40 +15,18 @@ import (
 )
 
 var (
-	version string
+	version              string
+	supported_extensions string
 )
 
-func filter[T any](ss []T, test func(T) bool) (ret []T) {
-	for _, s := range ss {
-		if test(s) {
-			ret = append(ret, s)
-		}
-	}
-	return
-}
-
 func main() {
-	files, err := os.ReadDir("./converter")
-	if err != nil {
-		fmt.Println("[ERROR]", err)
-	}
-	converter_folders := filter(files, func(file os.DirEntry) bool {
-		return file.IsDir() && file.Name() != "shared"
-	})
-
-	directory_names := make([]string, 0, len(converter_folders))
-	for _, folder := range converter_folders {
-		directory_names = append(directory_names, folder.Name())
-	}
-	allowed_extensions := strings.Join(directory_names, ", ")
-
 	app := &cli.App{
 		Name:    "subtitle-to-lrc",
 		Version: version,
 		Usage:   "Convert subtitle files to .lrc format",
 		UsageText: "subtitle-to-lrc [options] <input-file> [output-file]\n" +
 			"\n" +
-			"<input-file> - the file must have an allowed subtitle extension (" + allowed_extensions + ")\n" +
+			"<input-file> - the file must have an allowed subtitle extension (" + supported_extensions + ")\n" +
 			"[output-file] - if not provided the program will use <input-file> filename with its extension replaced by .lrc",
 		Compiled:               time.Now(),
 		EnableBashCompletion:   true,

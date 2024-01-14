@@ -1,4 +1,4 @@
-# subtitle-to-lrc 0.1.1
+# subtitle-to-lrc 0.1.0
 
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 [![Build and release](https://github.com/shipurjan/subtitle-to-lrc/actions/workflows/go.yml/badge.svg)](https://github.com/shipurjan/subtitle-to-lrc/actions/workflows/go.yml) 
@@ -26,7 +26,7 @@ USAGE:
    [output-file] - if not provided the program will use <input-file> filename with its extension replaced by .lrc
 
 VERSION:
-   0.1.1
+   0.1.0
 
 AUTHOR:
    Cyprian Zdebski <cyprianz5mail@gmail.com>
