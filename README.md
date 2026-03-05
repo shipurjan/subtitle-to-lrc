@@ -74,5 +74,5 @@ so that the versioning is correctly updated before pushing
 ```console
 go install github.com/automation-co/husky@latest
 husky init
-
 ```
+
