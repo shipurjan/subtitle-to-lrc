@@ -11,7 +11,7 @@ Currently supported input formats:
 
 ## Why?
 
-One use case is to convert podcast subtitles to the lyrics format (.lrc), which can then be played on various portable music/media players
+One use case is to convert podcast subtitles to the lyrics format (.lrc), which can then be played on various portable music/media players such as foobar2000 with OpenLyrics plugin
 
 ## Usage
 
@@ -75,3 +75,4 @@ so that the versioning is correctly updated before pushing
 go install github.com/automation-co/husky@latest
 husky init
 ```
+
